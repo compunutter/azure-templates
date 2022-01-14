@@ -63,6 +63,3 @@ module newRsv 'module.rsv.bicep' = {
     tags: tags
   }
 }
-
-// TODO: VmStartStop Script
-// TODO: Run PS script to add RMM to domain controller

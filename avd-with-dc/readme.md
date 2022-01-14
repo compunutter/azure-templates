@@ -1,9 +1,5 @@
 # Deploy AVD with DomainController to Azure
 
-Use the following command:
-
-``` New-AzDeployment -DeploymentName "AvdDeploymentPart1" -Location uksouth -TemplateFile main.bicep ```
-
 ## Part 1
 The following will be deployed:
 * Resource Group
