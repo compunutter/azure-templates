@@ -1,10 +1,10 @@
-param custPrefix string
+param resPrefix string
 param adminUsername string
 param adminPass string
 param subnetId string
 param tags object
 
-var vmName = '${custPrefix}-vm-ad01'
+var vmName = '${resPrefix}-vm-ad01'
 var dcNic = '${vmName}-nic'
 
 // Create NIC for DC
@@ -38,7 +38,7 @@ resource dcVirtualMachine 'Microsoft.Compute/virtualMachines@2021-07-01' = {
       vmSize: 'Standard_B4ms'
     }
     osProfile: {
-      computerName: '${custPrefix}-ad01'
+      computerName: '${resPrefix}-ad01'
       adminUsername: adminUsername
       adminPassword: adminPass
       windowsConfiguration: {

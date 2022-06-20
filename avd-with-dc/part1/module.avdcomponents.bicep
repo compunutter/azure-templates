@@ -1,13 +1,13 @@
-param custPrefix string
+param resPrefix string
 param tags object
 
 //Create AVD Hostpool
 resource hp 'Microsoft.DesktopVirtualization/hostpools@2019-12-10-preview' = {
-  name: '${custPrefix}-hpl-${resourceGroup().location}-1'
+  name: '${resPrefix}-hpl-${resourceGroup().location}-1'
   location: resourceGroup().location
   tags: tags
   properties: {
-    friendlyName: '${custPrefix} AVD Host Pool'
+    friendlyName: '${resPrefix} AVD Host Pool'
     hostPoolType: 'Pooled'
     loadBalancerType: 'BreadthFirst'
     preferredAppGroupType: 'Desktop'
@@ -18,11 +18,11 @@ resource hp 'Microsoft.DesktopVirtualization/hostpools@2019-12-10-preview' = {
 
 //Create AVD AppGroup
 resource ag 'Microsoft.DesktopVirtualization/applicationgroups@2019-12-10-preview' = {
-  name: '${custPrefix}-dag-${resourceGroup().location}-desktop'
+  name: '${resPrefix}-dag-${resourceGroup().location}-desktop'
   location: resourceGroup().location
   tags: tags
   properties: {
-    friendlyName: '${custPrefix} Desktop Application Group'
+    friendlyName: '${resPrefix} Desktop Application Group'
     applicationGroupType: 'Desktop'
     hostPoolArmPath: hp.id
   }
@@ -30,11 +30,11 @@ resource ag 'Microsoft.DesktopVirtualization/applicationgroups@2019-12-10-previe
 
 //Create AVD Workspace
 resource ws 'Microsoft.DesktopVirtualization/workspaces@2019-12-10-preview' = {
-  name: '${custPrefix}-${resourceGroup().location}-ws'
+  name: '${resPrefix}-${resourceGroup().location}-ws'
   location: resourceGroup().location
   tags: tags
   properties: {
-    friendlyName: '${custPrefix} Workspace'
+    friendlyName: '${resPrefix} Workspace'
     applicationGroupReferences: [
       ag.id
     ]

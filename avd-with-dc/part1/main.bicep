@@ -1,10 +1,15 @@
+@description('Value for \'Customer\' tag.')
 param custName string
+@description('Resource prefix (do not add hyphen, will be converted to lowercase).')
 param custPrefix string
+@description('Local admin user - cannot be administrator')
 param adminUsername string
 @secure()
+@description('Local admin password')
 param adminPass string
 
 targetScope = 'subscription'
+var resPrefix = toLower(custPrefix)
 
 param tags object = {
   Customer: custName
@@ -14,7 +19,7 @@ param tags object = {
 
 // Create resource group
 resource newRG 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: '${custPrefix}-rg-avd'
+  name: '${resPrefix}-rg-avd'
   location: deployment().location
   tags: tags
 }
@@ -24,7 +29,7 @@ module newVnet 'module.network.bicep' = {
   name: 'networkModule'
   scope: newRG
   params: {
-    custPrefix: custPrefix
+    resPrefix: resPrefix
     tags: tags
   }
 }
@@ -34,7 +39,7 @@ module newDc 'module.domaincontroller.bicep' = {
   name: 'domainControllerModule'
   scope: newRG
   params: {
-    custPrefix: custPrefix
+    resPrefix: resPrefix
     adminUsername: adminUsername
     adminPass: adminPass
     subnetId: newVnet.outputs.subnetId
@@ -47,7 +52,7 @@ module newAVDTenant 'module.avdcomponents.bicep' = {
   name: 'avdComponentsModule'
   scope: newRG
   params: {
-    custPrefix: custPrefix
+    resPrefix: resPrefix
     tags: tags
   }
 }
@@ -57,7 +62,7 @@ module newRsv 'module.rsv.bicep' = {
   name: 'rsvModule'
   scope: newRG
   params: {
-    custPrefix: custPrefix
+    resPrefix: resPrefix
     domainControllerId: newDc.outputs.domainControllerId
     domainControllerName: newDc.outputs.domainControllerName
     tags: tags

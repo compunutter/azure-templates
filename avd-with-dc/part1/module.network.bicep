@@ -1,9 +1,9 @@
-param custPrefix string
+param resPrefix string
 param tags object
 
 // Create VNET
 resource vn 'Microsoft.Network/virtualNetworks@2019-11-01' = {
-  name: '${custPrefix}-vnet-${resourceGroup().location}-corp'
+  name: '${resPrefix}-vnet-${resourceGroup().location}-corp'
   location: resourceGroup().location
   tags: tags
   properties: {

@@ -4,22 +4,34 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.4.1124.51302",
-      "templateHash": "7203333434547230792"
+      "version": "0.7.4.23292",
+      "templateHash": "11433851410796281644"
     }
   },
   "parameters": {
     "custName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Value for 'Customer' tag."
+      }
     },
     "custPrefix": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Resource prefix (do not add hyphen, will be converted to lowercase)."
+      }
     },
     "adminUsername": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Local admin user - cannot be administrator"
+      }
     },
     "adminPass": {
-      "type": "secureString"
+      "type": "secureString",
+      "metadata": {
+        "description": "Local admin password"
+      }
     },
     "tags": {
       "type": "object",
@@ -30,11 +42,14 @@
       }
     }
   },
+  "variables": {
+    "resPrefix": "[toLower(parameters('custPrefix'))]"
+  },
   "resources": [
     {
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
-      "name": "[format('{0}-rg-avd', parameters('custPrefix'))]",
+      "name": "[format('{0}-rg-avd', variables('resPrefix'))]",
       "location": "[deployment().location]",
       "tags": "[parameters('tags')]"
     },
@@ -42,15 +57,15 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
       "name": "networkModule",
-      "resourceGroup": "[format('{0}-rg-avd', parameters('custPrefix'))]",
+      "resourceGroup": "[format('{0}-rg-avd', variables('resPrefix'))]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
         },
         "mode": "Incremental",
         "parameters": {
-          "custPrefix": {
-            "value": "[parameters('custPrefix')]"
+          "resPrefix": {
+            "value": "[variables('resPrefix')]"
           },
           "tags": {
             "value": "[parameters('tags')]"
@@ -62,12 +77,12 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.4.1124.51302",
-              "templateHash": "3670828212325052511"
+              "version": "0.7.4.23292",
+              "templateHash": "10956363090805502948"
             }
           },
           "parameters": {
-            "custPrefix": {
+            "resPrefix": {
               "type": "string"
             },
             "tags": {
@@ -78,7 +93,7 @@
             {
               "type": "Microsoft.Network/virtualNetworks",
               "apiVersion": "2019-11-01",
-              "name": "[format('{0}-vnet-{1}-corp', parameters('custPrefix'), resourceGroup().location)]",
+              "name": "[format('{0}-vnet-{1}-corp', parameters('resPrefix'), resourceGroup().location)]",
               "location": "[resourceGroup().location]",
               "tags": "[parameters('tags')]",
               "properties": {
@@ -98,40 +113,40 @@
             {
               "type": "Microsoft.Network/virtualNetworks/subnets",
               "apiVersion": "2021-05-01",
-              "name": "[format('{0}/{1}', format('{0}-vnet-{1}-corp', parameters('custPrefix'), resourceGroup().location), 'Servers')]",
+              "name": "[format('{0}/{1}', format('{0}-vnet-{1}-corp', parameters('resPrefix'), resourceGroup().location), 'Servers')]",
               "properties": {
                 "addressPrefix": "10.0.0.0/24"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', format('{0}-vnet-{1}-corp', parameters('custPrefix'), resourceGroup().location))]"
+                "[resourceId('Microsoft.Network/virtualNetworks', format('{0}-vnet-{1}-corp', parameters('resPrefix'), resourceGroup().location))]"
               ]
             }
           ],
           "outputs": {
             "subnetId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', format('{0}-vnet-{1}-corp', parameters('custPrefix'), resourceGroup().location), 'Servers')]"
+              "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', format('{0}-vnet-{1}-corp', parameters('resPrefix'), resourceGroup().location), 'Servers')]"
             }
           }
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg-avd', parameters('custPrefix')))]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg-avd', variables('resPrefix')))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
       "name": "domainControllerModule",
-      "resourceGroup": "[format('{0}-rg-avd', parameters('custPrefix'))]",
+      "resourceGroup": "[format('{0}-rg-avd', variables('resPrefix'))]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
         },
         "mode": "Incremental",
         "parameters": {
-          "custPrefix": {
-            "value": "[parameters('custPrefix')]"
+          "resPrefix": {
+            "value": "[variables('resPrefix')]"
           },
           "adminUsername": {
             "value": "[parameters('adminUsername')]"
@@ -140,7 +155,7 @@
             "value": "[parameters('adminPass')]"
           },
           "subnetId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg-avd', parameters('custPrefix'))), 'Microsoft.Resources/deployments', 'networkModule'), '2020-10-01').outputs.subnetId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg-avd', variables('resPrefix'))), 'Microsoft.Resources/deployments', 'networkModule')).outputs.subnetId.value]"
           },
           "tags": {
             "value": "[parameters('tags')]"
@@ -152,12 +167,12 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.4.1124.51302",
-              "templateHash": "10467367381661483845"
+              "version": "0.7.4.23292",
+              "templateHash": "6779363917821899785"
             }
           },
           "parameters": {
-            "custPrefix": {
+            "resPrefix": {
               "type": "string"
             },
             "adminUsername": {
@@ -174,7 +189,7 @@
             }
           },
           "variables": {
-            "vmName": "[format('{0}-vm-ad01', parameters('custPrefix'))]",
+            "vmName": "[format('{0}-vm-ad01', parameters('resPrefix'))]",
             "dcNic": "[format('{0}-nic', variables('vmName'))]"
           },
           "resources": [
@@ -210,7 +225,7 @@
                   "vmSize": "Standard_B4ms"
                 },
                 "osProfile": {
-                  "computerName": "[format('{0}-ad01', parameters('custPrefix'))]",
+                  "computerName": "[format('{0}-ad01', parameters('resPrefix'))]",
                   "adminUsername": "[parameters('adminUsername')]",
                   "adminPassword": "[parameters('adminPass')]",
                   "windowsConfiguration": {
@@ -271,23 +286,23 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg-avd', parameters('custPrefix')))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg-avd', parameters('custPrefix'))), 'Microsoft.Resources/deployments', 'networkModule')]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg-avd', variables('resPrefix')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg-avd', variables('resPrefix'))), 'Microsoft.Resources/deployments', 'networkModule')]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
       "name": "avdComponentsModule",
-      "resourceGroup": "[format('{0}-rg-avd', parameters('custPrefix'))]",
+      "resourceGroup": "[format('{0}-rg-avd', variables('resPrefix'))]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
         },
         "mode": "Incremental",
         "parameters": {
-          "custPrefix": {
-            "value": "[parameters('custPrefix')]"
+          "resPrefix": {
+            "value": "[variables('resPrefix')]"
           },
           "tags": {
             "value": "[parameters('tags')]"
@@ -299,12 +314,12 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.4.1124.51302",
-              "templateHash": "14350286401232800994"
+              "version": "0.7.4.23292",
+              "templateHash": "14243259913163270435"
             }
           },
           "parameters": {
-            "custPrefix": {
+            "resPrefix": {
               "type": "string"
             },
             "tags": {
@@ -315,11 +330,11 @@
             {
               "type": "Microsoft.DesktopVirtualization/hostPools",
               "apiVersion": "2019-12-10-preview",
-              "name": "[format('{0}-hpl-{1}-1', parameters('custPrefix'), resourceGroup().location)]",
+              "name": "[format('{0}-hpl-{1}-1', parameters('resPrefix'), resourceGroup().location)]",
               "location": "[resourceGroup().location]",
               "tags": "[parameters('tags')]",
               "properties": {
-                "friendlyName": "[format('{0} AVD Host Pool', parameters('custPrefix'))]",
+                "friendlyName": "[format('{0} AVD Host Pool', parameters('resPrefix'))]",
                 "hostPoolType": "Pooled",
                 "loadBalancerType": "BreadthFirst",
                 "preferredAppGroupType": "Desktop",
@@ -330,60 +345,60 @@
             {
               "type": "Microsoft.DesktopVirtualization/applicationGroups",
               "apiVersion": "2019-12-10-preview",
-              "name": "[format('{0}-dag-{1}-desktop', parameters('custPrefix'), resourceGroup().location)]",
+              "name": "[format('{0}-dag-{1}-desktop', parameters('resPrefix'), resourceGroup().location)]",
               "location": "[resourceGroup().location]",
               "tags": "[parameters('tags')]",
               "properties": {
-                "friendlyName": "[format('{0} Desktop Application Group', parameters('custPrefix'))]",
+                "friendlyName": "[format('{0} Desktop Application Group', parameters('resPrefix'))]",
                 "applicationGroupType": "Desktop",
-                "hostPoolArmPath": "[resourceId('Microsoft.DesktopVirtualization/hostPools', format('{0}-hpl-{1}-1', parameters('custPrefix'), resourceGroup().location))]"
+                "hostPoolArmPath": "[resourceId('Microsoft.DesktopVirtualization/hostPools', format('{0}-hpl-{1}-1', parameters('resPrefix'), resourceGroup().location))]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.DesktopVirtualization/hostPools', format('{0}-hpl-{1}-1', parameters('custPrefix'), resourceGroup().location))]"
+                "[resourceId('Microsoft.DesktopVirtualization/hostPools', format('{0}-hpl-{1}-1', parameters('resPrefix'), resourceGroup().location))]"
               ]
             },
             {
               "type": "Microsoft.DesktopVirtualization/workspaces",
               "apiVersion": "2019-12-10-preview",
-              "name": "[format('{0}-{1}-ws', parameters('custPrefix'), resourceGroup().location)]",
+              "name": "[format('{0}-{1}-ws', parameters('resPrefix'), resourceGroup().location)]",
               "location": "[resourceGroup().location]",
               "tags": "[parameters('tags')]",
               "properties": {
-                "friendlyName": "[format('{0} Workspace', parameters('custPrefix'))]",
+                "friendlyName": "[format('{0} Workspace', parameters('resPrefix'))]",
                 "applicationGroupReferences": [
-                  "[resourceId('Microsoft.DesktopVirtualization/applicationGroups', format('{0}-dag-{1}-desktop', parameters('custPrefix'), resourceGroup().location))]"
+                  "[resourceId('Microsoft.DesktopVirtualization/applicationGroups', format('{0}-dag-{1}-desktop', parameters('resPrefix'), resourceGroup().location))]"
                 ]
               },
               "dependsOn": [
-                "[resourceId('Microsoft.DesktopVirtualization/applicationGroups', format('{0}-dag-{1}-desktop', parameters('custPrefix'), resourceGroup().location))]"
+                "[resourceId('Microsoft.DesktopVirtualization/applicationGroups', format('{0}-dag-{1}-desktop', parameters('resPrefix'), resourceGroup().location))]"
               ]
             }
           ]
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg-avd', parameters('custPrefix')))]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg-avd', variables('resPrefix')))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
       "name": "rsvModule",
-      "resourceGroup": "[format('{0}-rg-avd', parameters('custPrefix'))]",
+      "resourceGroup": "[format('{0}-rg-avd', variables('resPrefix'))]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
         },
         "mode": "Incremental",
         "parameters": {
-          "custPrefix": {
-            "value": "[parameters('custPrefix')]"
+          "resPrefix": {
+            "value": "[variables('resPrefix')]"
           },
           "domainControllerId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg-avd', parameters('custPrefix'))), 'Microsoft.Resources/deployments', 'domainControllerModule'), '2020-10-01').outputs.domainControllerId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg-avd', variables('resPrefix'))), 'Microsoft.Resources/deployments', 'domainControllerModule')).outputs.domainControllerId.value]"
           },
           "domainControllerName": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg-avd', parameters('custPrefix'))), 'Microsoft.Resources/deployments', 'domainControllerModule'), '2020-10-01').outputs.domainControllerName.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg-avd', variables('resPrefix'))), 'Microsoft.Resources/deployments', 'domainControllerModule')).outputs.domainControllerName.value]"
           },
           "tags": {
             "value": "[parameters('tags')]"
@@ -395,12 +410,12 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.4.1124.51302",
-              "templateHash": "11814176982695320395"
+              "version": "0.7.4.23292",
+              "templateHash": "2820095915787648198"
             }
           },
           "parameters": {
-            "custPrefix": {
+            "resPrefix": {
               "type": "string"
             },
             "domainControllerName": {
@@ -422,7 +437,7 @@
             {
               "type": "Microsoft.RecoveryServices/vaults",
               "apiVersion": "2021-08-01",
-              "name": "[format('{0}-rsv-{1}-1', parameters('custPrefix'), resourceGroup().location)]",
+              "name": "[format('{0}-rsv-{1}-1', parameters('resPrefix'), resourceGroup().location)]",
               "location": "[resourceGroup().location]",
               "tags": "[parameters('tags')]",
               "sku": {
@@ -434,36 +449,21 @@
             {
               "type": "Microsoft.RecoveryServices/vaults/backupstorageconfig",
               "apiVersion": "2021-10-01",
-              "name": "[format('{0}/VaultStorageConfig', format('{0}-rsv-{1}-1', parameters('custPrefix'), resourceGroup().location))]",
+              "name": "[format('{0}/VaultStorageConfig', format('{0}-rsv-{1}-1', parameters('resPrefix'), resourceGroup().location))]",
               "location": "[resourceGroup().location]",
               "properties": {
                 "storageType": "LocallyRedundant"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.RecoveryServices/vaults', format('{0}-rsv-{1}-1', parameters('custPrefix'), resourceGroup().location))]"
-              ]
-            },
-            {
-              "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
-              "apiVersion": "2021-10-01",
-              "name": "[format('{0}/{1}/{2}/{3}', format('{0}-rsv-{1}-1', parameters('custPrefix'), resourceGroup().location), variables('backupFabric'), variables('protectionContainer'), variables('protectedItem'))]",
-              "location": "[resourceGroup().location]",
-              "properties": {
-                "protectedItemType": "Microsoft.Compute/virtualMachines",
-                "policyId": "[format('{0}/backupPolicies/DefaultPolicy', resourceId('Microsoft.RecoveryServices/vaults', format('{0}-rsv-{1}-1', parameters('custPrefix'), resourceGroup().location)))]",
-                "sourceResourceId": "[parameters('domainControllerId')]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.RecoveryServices/vaults', format('{0}-rsv-{1}-1', parameters('custPrefix'), resourceGroup().location))]",
-                "[resourceId('Microsoft.RecoveryServices/vaults/backupstorageconfig', split(format('{0}/VaultStorageConfig', format('{0}-rsv-{1}-1', parameters('custPrefix'), resourceGroup().location)), '/')[0], split(format('{0}/VaultStorageConfig', format('{0}-rsv-{1}-1', parameters('custPrefix'), resourceGroup().location)), '/')[1])]"
+                "[resourceId('Microsoft.RecoveryServices/vaults', format('{0}-rsv-{1}-1', parameters('resPrefix'), resourceGroup().location))]"
               ]
             }
           ]
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg-avd', parameters('custPrefix'))), 'Microsoft.Resources/deployments', 'domainControllerModule')]",
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg-avd', parameters('custPrefix')))]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('{0}-rg-avd', variables('resPrefix'))), 'Microsoft.Resources/deployments', 'domainControllerModule')]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', format('{0}-rg-avd', variables('resPrefix')))]"
       ]
     }
   ]
