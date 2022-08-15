@@ -8,10 +8,10 @@
 #New-NetIPAddress –IPAddress 192.168.1.13 -DefaultGateway 192.168.1.1 -PrefixLength 24 -InterfaceIndex (Get-NetAdapter).InterfaceIndex
 # ^^ Not working - giving a 'Instance MSFT_NetIPAddress already exists' error
 
-Rename-Computer -NewName "ARC-AD01"
+Rename-Computer -NewName "<hostname>"
 
 Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
-Install-ADDSForest -DomainName "archus.local" -DomainNetBiosName "ARCHUS" -InstallDns
+Install-ADDSForest -DomainName "<domain>.local" -DomainNetBiosName "<domain>" -InstallDns
 
 # Add domain as a UPN suffix
 
